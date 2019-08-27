@@ -2,8 +2,6 @@ function basecamera(widget_id, url, skin, parameters)
 {
     self = this
 
-    console.log(parameters)
-
     // Initialization
     
     self.parameters = parameters;
@@ -30,8 +28,6 @@ function basecamera(widget_id, url, skin, parameters)
     
     function refresh_frame(self)
     {
-        console.log(self)
-
         if ("base_uri" in self.parameters && "entity_picture" in self) {
             var url = self.parameters.base_uri + self.entity_picture
         } 
@@ -50,7 +46,7 @@ function basecamera(widget_id, url, skin, parameters)
         }
         self.set_field(self, "img_src", url);
         self.index = 0
-        console.log(url)
+
         if ("refresh" in self.parameters)
         {
             setTimeout(function() {refresh_frame(self)}, self.parameters.refresh * 1000);
@@ -64,7 +60,7 @@ function basecamera(widget_id, url, skin, parameters)
     // state is the initial state
     
     function OnStateAvailable(self, state)
-    {        
+    {   
         self.state = state.state;
         self.entity_picture = state.attributes.entity_picture
         refresh_frame(self)
