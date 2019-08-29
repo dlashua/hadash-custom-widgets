@@ -24,17 +24,25 @@ function basecamera(widget_id, url, skin, parameters)
     
     self.index = 0;
     refresh_frame(self)
-    
+    self.timeout = undefined
     
     function refresh_frame(self)
     {
-        if ("base_uri" in self.parameters && "entity_picture" in self) {
-            var url = self.parameters.base_uri + self.entity_picture
+        if ("base_uri" in self.parameters && "access_token" in self) {
+            var endpoint = '/api/camera_proxy/'
+            if ('stream' in self.parameters && self.parameters.stream) {
+                endpoint = '/api/camera_proxy_stream/'
+            }
+
+            var url = self.parameters.base_uri + endpoint + self.parameters.entity + '?token=' + self.access_token 
         } 
         else 
         {
             var url = '/images/Blank.gif'
         }
+
+
+        console.log(url)
 
         if (url.indexOf('?') > -1)
         {
@@ -47,10 +55,21 @@ function basecamera(widget_id, url, skin, parameters)
         self.set_field(self, "img_src", url);
         self.index = 0
 
+        var refresh = 10
         if ("refresh" in self.parameters)
         {
-            setTimeout(function() {refresh_frame(self)}, self.parameters.refresh * 1000);
+            refresh = self.parameters.refresh
         }
+        if ('stream' in self.parameters && self.parameters.stream) {
+            refresh = 0
+        }
+        if (refresh > 0)
+        {
+            console.log('setting timeout ' + refresh.toString())
+            clearTimeout(self.timeout)
+            self.timeout = setTimeout(function() {refresh_frame(self)}, refresh * 1000);
+        }
+
     }
 
     // Function Definitions
@@ -62,7 +81,7 @@ function basecamera(widget_id, url, skin, parameters)
     function OnStateAvailable(self, state)
     {   
         self.state = state.state;
-        self.entity_picture = state.attributes.entity_picture
+        self.access_token = state.attributes.access_token
         refresh_frame(self)
     }
     
@@ -73,7 +92,7 @@ function basecamera(widget_id, url, skin, parameters)
     function OnStateUpdate(self, state)
     {
         self.state = state.state;
-        self.entity_picture = state.attributes.entity_picture
+        self.access_token = state.attributes.access_token
         refresh_frame(self)
     }
 
